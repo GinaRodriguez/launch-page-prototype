@@ -1,0 +1,660 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex, nofollow">
+<title>Introducing ChatGPTforce | Salesforce × OpenAI</title>
+<style>
+@font-face{font-family:"Salesforce Sans";src:url("assets/fonts/SalesforceSans-Regular.ttf") format("truetype");font-weight:400;font-style:normal;font-display:swap}
+@font-face{font-family:"Avant Garde For Salesforce";src:url("assets/fonts/ITCAvantGardeStd-Demi.otf") format("opentype");font-weight:600;font-style:normal;font-display:swap}
+@font-face{font-family:"Salesforce Sans";src:url("assets/fonts/SalesforceSans-Bold.ttf") format("truetype");font-weight:700;font-style:normal;font-display:swap}
+:root{
+  --float-ease: cubic-bezier(.45, 0, .55, 1); /* smooth sine-like in/out */
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html{background:#0d0f3b}
+body{background:linear-gradient(#0d0f3b 0,#0d0f3b 7642px,#fff 7642px);overflow-x:hidden}
+/* Fit-to-width: the 1440x633 design scales down on smaller screens */
+/* Locks the 1440px design to the browser width: --s = (width of the page) / 1440, at any window size (smaller or larger) */
+.cq{container-type:inline-size;width:100%}
+.fit{--s:tan(atan2(100cqw,1440px));--stack-extra:1942px;width:100%;height:calc((7855px + var(--stack-extra)) * var(--s));overflow:clip}
+.stage{width:1440px;transform:scale(var(--s));transform-origin:0 0}
+
+/* 1440 x 633 stage, matches the Figma frame */
+.hero{position:relative;width:1440px;height:633px;overflow:hidden;background:#1f166f;isolation:isolate}  /* dark (not white) so no light edge shows where the hero meets the next section */
+.layer{position:absolute;display:block;max-width:none;pointer-events:none}
+.glines,.glines2,.gdots{opacity:.4}
+.glines{left:-6.05px;top:-50px;width:1459.77px;height:1453.45px}
+.glines2{left:-6.34px;top:-49.6px;width:1459.77px;height:1453.45px}
+.gdots{position:absolute;display:block;overflow:visible;pointer-events:none}
+.gdots.sm{left:86.86px;top:136.41px;width:1328.35px;height:475.71px}
+.gdots.lg{left:409.2px;top:127.33px;width:27.65px;height:492.67px}
+/* very subtle dot pulse: tiny scale + soft fade, each dot on its own timing */
+.pulse{transform-box:fill-box;transform-origin:center;animation:dotpulse var(--pt,2.6s) cubic-bezier(.45,0,.55,1) var(--pd,0s) infinite}
+@keyframes dotpulse{0%,100%{transform:scale(1);opacity:1}50%{transform:scale(1.22);opacity:.55}}
+/* Global nav: live text + vector logo/icons so it stays sharp */
+.gnav{position:absolute;left:0;top:0;width:1440px;height:76px;background:#fff;color:#032d60;font:700 14px/1 "Salesforce Sans","Helvetica Neue",Arial,sans-serif;z-index:3}
+.gnav a{color:inherit;text-decoration:none;position:absolute;white-space:nowrap}
+.gn-logo{left:31.5px;top:15.5px;width:137px;height:43px;overflow:hidden}
+.gn-logo img{position:absolute;display:block;max-width:none}
+.gn-links a{top:31px}
+.gn-links a:hover,.gn-login:hover,.gn-contact:hover{color:#0176d3}
+.gn-contact{left:1107px;top:33px;font-size:12px;font-weight:700;text-decoration:underline!important}
+.gn-globe{position:absolute;left:1186px;top:31px;width:15px;height:15px}
+.gn-login{left:1223.5px;top:32px;display:flex;align-items:center;gap:4px}
+.gn-login svg{width:13px;height:13px}
+.gn-cta{left:1297px;top:22px;width:111px;height:36px;border-radius:18px;background:#2e844a;color:#fff!important;display:flex;align-items:center;justify-content:center;transition:background .2s}
+.gn-cta:hover{background:#215f33}
+.background{left:-34px;top:-31.43px;width:1487px;height:719.54px}
+.pshadow{position:absolute;background:#201b89;filter:blur(27px);pointer-events:none}
+.stars{left:0;top:0;width:1440px;height:633px;mix-blend-mode:screen;animation:twinkle var(--tw,1.9s) cubic-bezier(.45,0,.55,1) var(--td,0s) infinite alternate}
+@keyframes twinkle{0%{opacity:.32}100%{opacity:1}}
+.st1{--tw:1.5s;--td:-.4s}.st2{--tw:2.1s;--td:-1.1s}.st3{--tw:1.8s;--td:-.7s}.st4{--tw:2.5s;--td:-1.6s}
+.grid{left:0;top:0;width:1440px;height:633px}
+.wavevec{position:absolute;left:-6px;top:67px;width:1470px;height:563px;opacity:.8;pointer-events:none}
+.wavevec img{position:absolute;display:block;max-width:none}
+.wavevec .dd{mix-blend-mode:color-dodge}
+.wavevec .ell{position:absolute}
+.lockup{position:absolute;left:634px;top:112px;width:170px;height:53.71px;pointer-events:none}
+.lockup img{position:absolute;display:block;max-width:none}
+.headline{left:225px;top:185px;width:982px;height:99px}
+.nav{left:-.28px;top:-.48px;width:1440px;height:76px}
+
+/* "Introducing" is live text (Avant Garde Demi). The image below is clipped so only "ChatGPTforce" shows. */
+.headline{left:260.76px;top:197.27px;width:939.82px;height:79.81px;clip-path:inset(0 0 0 432px)} /* vector, so it stays sharp at any size */
+.intro{position:absolute;left:255px;top:199.5px;margin:0;white-space:nowrap;
+  font:600 80px/80px "Avant Garde For Salesforce","Helvetica Neue",Arial,sans-serif;letter-spacing:-1.6px;
+  background:linear-gradient(90deg,rgb(60,45,255) 0%,rgb(43,79,255) 9%,rgb(21,131,255) 19%,rgb(4,171,254) 28%,rgb(1,182,250) 47%,rgb(1,193,239) 66%,rgb(2,200,231) 85%,rgb(2,206,225) 94%,rgb(3,208,222) 100%);
+  -webkit-background-clip:text;background-clip:text;color:transparent;-webkit-text-fill-color:transparent}
+.subhead{position:absolute;left:224px;top:311px;width:998px;text-align:center;color:#fff;
+  font:600 30px/1.08 "Avant Garde For Salesforce","Helvetica Neue",Arial,sans-serif;letter-spacing:-.6px}
+.body{position:absolute;left:316px;top:356px;width:805px;text-align:center;color:#fff;
+  font:700 20px/28px "Salesforce Sans","Helvetica Neue",Arial,sans-serif;letter-spacing:.012px}
+.cta{position:absolute;left:630px;top:439px;width:177px;height:52px;border:2.5px solid rgba(46,123,255,.95);
+  background:rgba(13,15,59,.05);border-radius:54px;display:flex;align-items:center;justify-content:center;
+  color:#fff;text-decoration:none;font:700 16px/1.2 "Salesforce Sans","Helvetica Neue",Arial,sans-serif}
+
+/* Icons: position = centre of the rendered icon in the Figma frame; the tilt lives on the <img> so the wrapper is free to float */
+.icon{position:absolute;pointer-events:none}
+.icon img{position:absolute;inset:0;width:100%;height:100%;max-width:none;object-fit:cover;display:block}
+.tableau{left:89.7px;top:280.7px;width:67.6px;height:67.6px;opacity:.8;filter:drop-shadow(0 13px 21.5px #0b1faa)}
+.tableau img{filter:blur(0.5px)}
+.alfred{left:1151.8px;top:307.8px;width:224.4px;height:224.4px;filter:drop-shadow(0 13px 43px #051aa9)}
+.alfred img{transform:rotate(13deg)}
+.mulesoft{left:1122.2px;top:484.2px;width:79.5px;height:79.5px;filter:drop-shadow(0 -1px 15.5px #051aa9)}
+.mulesoft img{transform:rotate(19deg);filter:blur(1px)}
+.spark{left:1113.4px;top:386.4px;width:37.8px;height:40.3px;}
+.spark img{filter:blur(1px)}
+.marketing{left:251.7px;top:373.6px;width:66.7px;height:66.7px;filter:drop-shadow(0 13px 21.5px #051aa9)}
+.marketing img{transform:rotate(-16deg);filter:blur(1px)}
+.sales{left:1277.5px;top:211.5px;width:78px;height:78px;filter:drop-shadow(0 13px 21.5px #051aa9)}
+.sales img{transform:rotate(-4deg);filter:blur(0.5px)}
+.jojo{left:48.4px;top:380.4px;width:235.2px;height:235.2px;filter:drop-shadow(0 9px 30px #051aa9)}
+.jojo img{transform:rotate(-23deg)}
+
+/* Gentle floating motion: only transform is animated, so design/colors/layout are untouched */
+.icon{
+  animation: float var(--dur,3.4s) var(--float-ease) var(--delay,0s) infinite;
+  will-change: transform;
+}
+@keyframes float{
+  0%,100%{transform:translate3d(0,0,0)}
+  50%    {transform:translate3d(0,var(--rise,-10px),0)}
+}
+.tableau  {--dur:3.6s; --delay:-1.2s; --rise:-9px}
+.marketing{--dur:4.0s; --delay:-3.6s; --rise:-10px}
+.sales    {--dur:3.8s; --delay:-.4s;  --rise:-9px}
+.alfred   {--dur:4.2s; --delay:-2.2s; --rise:-12px}
+.mulesoft {--dur:3.4s; --delay:-4.8s; --rise:-10px}
+.spark    {--dur:3.1s; --delay:-.9s;  --rise:-8px}
+.jojo     {--dur:4.5s;   --delay:-5.5s; --rise:-12px}
+
+@media (prefers-reduced-motion:reduce){ .icon,.pulse,.stars{animation:none} .stars{opacity:.85} }
+
+/* CTA interaction (hover/focus/press only; resting state is exactly the Figma design) */
+.cta{transition:background .25s ease,border-color .25s ease,transform .25s ease;cursor:pointer}
+.cta:hover{background:rgba(255,255,255,.12);border-color:#5b9bff;transform:translateY(-1px)}
+.cta:active{transform:translateY(0);background:rgba(255,255,255,.18)}
+.cta:focus-visible{outline:2px solid #fff;outline-offset:4px}
+.cta{pointer-events:auto;z-index:5}
+.sr-only{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
+/*REST-CSS-START*/
+/* ===== Rest of the page (below the hero) – positions are the Figma "bottom-page" frame, 1440 x 7223 ===== */
+.rest{position:relative;margin-top:-1px;width:1440px;height:calc(7223px + var(--stack-extra,0px));background:#fff;overflow:hidden;isolation:isolate;
+  --ink:#032d60;--display:"Avant Garde For Salesforce","Helvetica Neue",Arial,sans-serif;--sans:"Salesforce Sans","Helvetica Neue",Arial,sans-serif}
+.rest *{box-sizing:border-box}
+.rest .a{position:absolute}
+.rest img{display:block;max-width:none}
+.rest h2,.rest h3,.rest p{margin:0}
+.dsp{font-family:var(--display);font-weight:600;font-feature-settings:"lnum" 1,"pnum" 1}
+.r-grad{background-clip:text;-webkit-background-clip:text;color:transparent;-webkit-text-fill-color:transparent}
+
+/* backgrounds */
+.r-top{left:-1px;top:-4px;width:1443px;height:507px;background:linear-gradient(180deg,#1f166f,#04072f)}
+.r-bg{left:-34px;top:2px;width:1487px;height:5472px}
+.r-contour{left:-1px;top:5330px;width:1440px;height:147px}
+
+/* video poster */
+.r-video{left:198px;top:29px;width:1031px;height:580px;padding:0;border:0;background:none;cursor:pointer;border-radius:24px;overflow:hidden}
+.r-video img{width:1031px;height:580px}
+.r-video:focus-visible,.r-demo:focus-visible{outline:2px solid #fff;outline-offset:4px}
+
+/* section 3 */
+.r-h2{font-size:80px;line-height:.99;letter-spacing:.16px;text-align:center;white-space:nowrap}
+.r-title3{left:268px;top:756.9px;width:938px;height:158px;background-image:linear-gradient(171.8deg,#3a2bff 15.9%,#00b3ff 41.7%,#04e1cb 67.8%)}
+.r-para3{left:284px;top:932px;width:905px;font:400 18px/28px var(--sans);letter-spacing:.02px;text-align:center;color:#fff}
+.r-demo{left:372px;top:1081px;width:740px;height:416px;border:0;padding:0;border-radius:31.68px;overflow:hidden;background:#c9c9c9 url(assets/page/demo-poster.png) center/cover no-repeat;cursor:pointer}
+.r-demo .lbl{position:absolute;left:148px;top:87.5px;width:413px;text-align:center;font:600 24.355px/1.22 var(--display);letter-spacing:.0146px;color:#000}
+.r-demo img{position:absolute;left:335px;top:172px;width:69.8px;height:69.8px}
+.r-easier{left:268px;top:1572.7px;width:891px;text-align:center;color:#fff;font-size:36px;line-height:.99;letter-spacing:.072px}
+
+/* card stack */
+.r-card{border:3.88px solid rgba(6,106,254,.95);border-radius:30px;box-shadow:0 4px 4px rgba(0,0,0,.25);overflow:hidden;color:#fff;
+  background:
+   radial-gradient(ellipse 90% 62% at 100% 100%,#03f2ff 0%,#03e9ff 30%,#16c4ff 50%,rgba(6,160,250,.9) 66%,rgba(8,110,240,.45) 82%,rgba(8,90,236,0) 100%),
+   linear-gradient(180deg,#022ac0 0%,#022ac0 50%,#1a54e4 82%,#2069f1 100%)}
+.r-card .t{position:absolute;white-space:nowrap}
+.r-card .tile{position:absolute;width:80px;height:80px;border-radius:15.7px;background:rgba(0,16,76,.6);border:.74px solid #1ab9ff;box-shadow:0 10.7px 21.5px rgba(0,55,255,.25)}
+.r-card .tile img{position:absolute;left:11.5px;top:11.8px;width:55px;height:55px}
+/* ---- scroll-stack cards ----
+   The track is tall; while you scroll through it the card window stays pinned (script moves it) and each next card slides up over the last. */
+.r-fill{left:0;top:0;width:1440px;height:calc(2200px + var(--stack-extra,0px));background:#04072f}
+.r-lower{position:absolute;left:0;top:var(--stack-extra,0px);width:1440px;height:7223px}
+/* --mx slides the side labels and the cards together so the whole module (pill left edge 24 -> cards right edge 1255) sits centred on the 1440 page */
+.r-stack{--mx:80px;width:1440px;height:calc(480px + var(--stack-extra,0px))}
+.r-pin{position:absolute;left:0;top:0;width:1440px;height:696px}
+.r-sc{position:absolute;left:calc(193px + var(--mx,0px));top:0;width:1062px;height:480px;transform-origin:50% 0}
+.r-sc h3{position:absolute;left:46px;top:118.1px;font:600 41.193px/48.06px var(--display);letter-spacing:-.137px;color:#fff;font-feature-settings:"lnum" 1,"pnum" 1}
+.r-sc p{position:absolute;left:48.3px;top:224.6px;width:489px;font:400 17.164px/25.746px var(--sans);letter-spacing:.0172px;color:#fff}
+.r-sc .ph{position:absolute;left:593px;top:150px;width:428px;height:221px;border-radius:20px;background:#d9d9d9}
+.r-sc .tile{left:914px;top:37px}
+.r-sc.sc-n h3{left:44px}
+.r-sc.sc-n p{left:46.3px}
+.r-sc.sc-n .ph{left:569.1px;top:144.1px;height:220px}
+.r-sc.sc-n .tile{left:912.6px;top:36.3px}
+/* "Put Dots to Work" – Figma frame 945:4753. 1055x475 frame with a 2px stroke outside it (1059x479 overall); everything inside is placed from the frame's corner.
+   The fill is Figma's gradient (84.74deg on a rotated frame) re-expressed in px for this box; the 2px outline is a diagonal gradient (bright blue top-left -> dusty grey-blue bottom-right) fitted from the render.
+   Both match the Figma render to within 1-3 levels per channel. */
+.r-sc.sc-dd{left:calc(194.5px + var(--mx,0px));width:1059px;height:479px;border:2px solid transparent;border-radius:32px;box-shadow:none;
+  background:
+   linear-gradient(174.74063deg,#022ac0 307.06px,#00b3ff 571.53px,#90d0fe 648.75px,#eaf5fe 743.44px) padding-box,
+   linear-gradient(to bottom right,rgb(6,101,243) 0%,rgb(24,106,229) 10%,rgb(39,108,215) 20%,rgb(51,109,202) 30%,rgb(61,109,189) 40%,rgb(68,107,175) 50%,rgb(74,105,162) 60%,rgb(77,100,149) 70%,rgb(78,95,136) 80%,rgb(76,88,124) 90%,rgb(72,79,112) 100%) border-box}
+.r-sc.sc-dd h3{left:45.4px;top:118.4px}
+.r-sc.sc-dd p{left:47.48px;top:175.48px;width:481px}
+.r-sc.sc-dd .ph{left:570.94px;top:145.53px;width:428px;height:221px;border-radius:20px}
+.sc-dd .dd-tile{position:absolute;left:914.46px;top:38.18px;width:80px;height:80px;transform:rotate(90deg)}
+.sc-dd .dd-tile img{position:absolute;left:-21.864px;top:-11.12px;width:123.735px;height:123.735px}
+.sc-tableau{background:
+  radial-gradient(ellipse 36% 40% at 88% 100%,#e48a5c 0%,rgba(228,138,92,.92) 45%,rgba(228,138,92,0) 100%),
+  radial-gradient(ellipse 28% 42% at 56% 100%,rgba(112,111,190,.85),rgba(112,111,190,0)),
+  radial-gradient(ellipse 40% 36% at 66% 6%,rgba(30,40,215,.95),rgba(30,40,215,0)),
+  linear-gradient(180deg,#022ac0 0%,#022ac0 42%,#024ace 62%,#0370e0 80%,#0290ef 95%,#0297f2 100%)}
+.sc-ads,.sc-mule{background:
+  radial-gradient(ellipse 62% 55% at 88% 100%,#03f2ff 0%,#03e9ff 35%,rgba(2,170,252,.9) 60%,rgba(1,120,240,.4) 80%,rgba(1,100,235,0) 100%),
+  linear-gradient(180deg,#022ac0 0%,#022ac0 40%,#1241d6 62%,#1a54e4 79%,#1f63ee 100%)}
+/* title shown in the visible strip of a card once the next card has covered it (stack.js fades it in at the end of each slide) */
+.r-sc .hd{position:absolute;left:23px;top:17px;white-space:nowrap;font:600 24px/32px var(--display);letter-spacing:-.08px;color:#fff;font-feature-settings:"lnum" 1,"pnum" 1;opacity:0;pointer-events:none}
+.r-sc.sc-n .hd{left:21.1px;top:15.1px}
+/* side labels next to the stack: Dots, Tableau, OpenAI Ads, MuleSoft. The white pill slides to the label of the card on screen
+   Pill = label width + 22px each side, 64px tall. */
+.r-nav{position:absolute;left:var(--mx,0px);top:0;width:193px;height:320px}
+.r-nav .nv{position:absolute;left:46px;white-space:nowrap;font:600 18px/30px var(--display);letter-spacing:-.06px;color:#fff;transition:color .3s ease}
+.r-nav .nv-dots{top:96.6px}
+.r-nav .nv-tableau{top:152.6px}
+.r-nav .nv-ads{top:208.6px}
+.r-nav .nv-mule{top:264.6px}
+.r-pill{position:absolute;left:24px;top:78px;width:81.2px;height:64px;border-radius:60px;background:#fff;transition:transform .35s ease,width .35s ease,opacity .3s ease}
+.r-stack[data-active="tableau"] .r-pill{transform:translateY(56px);width:112.7px}
+.r-stack[data-active="ads"] .r-pill{transform:translateY(112px);width:149.24px}
+.r-stack[data-active="mule"] .r-pill{transform:translateY(168px);width:118.13px}
+.r-stack[data-active="dots"] .nv-dots,.r-stack[data-active="tableau"] .nv-tableau,.r-stack[data-active="ads"] .nv-ads,.r-stack[data-active="mule"] .nv-mule{color:#022d60}
+/* no script: the cards simply sit in a vertical list */
+.r-stack:not(.js) .r-pin{height:2100px}
+.r-stack:not(.js) .r-nav{display:none}
+.r-stack:not(.js){--mx:0px}
+.r-stack:not(.js) .r-sc:nth-of-type(2){top:530px}
+.r-stack:not(.js) .r-sc:nth-of-type(3){top:1060px}
+.r-stack:not(.js) .r-sc:nth-of-type(4){top:1590px}
+.r-stack.js .r-sc{will-change:transform}
+@media (prefers-reduced-motion:reduce){.r-nav .nv,.r-pill{transition:none}}
+
+
+/* quotes */
+.r-q{color:#fff}
+.r-q .mk{position:absolute;width:42.667px;height:32px}
+.r-q .qt{position:absolute;font:600 30px/40px var(--display);letter-spacing:-.06px;font-feature-settings:"lnum" 1,"pnum" 1}
+.r-q .nm{position:absolute;font:600 20px/28px var(--display);letter-spacing:-.06px;font-feature-settings:"lnum" 1,"pnum" 1;white-space:nowrap}
+.r-q .rl{position:absolute;font:400 20px/30px var(--sans);letter-spacing:.02px;white-space:nowrap}
+.r-photo{overflow:hidden;border-radius:16px}
+.r-photo img{position:absolute}
+
+/* section 5 */
+.r-title5{left:179px;top:3411.9px;width:1126px;height:237px;background-image:linear-gradient(169.8deg,#3a2bff 15.9%,#00b3ff 41.7%,#04e1cb 67.8%)}
+.r-spot{left:148px;top:3723px;width:1200px}
+.r-panel{position:relative;display:flex;height:420px;border-radius:20px;border:1px solid rgba(255,255,255,.1);background:rgba(255,255,255,.05);overflow:hidden;
+  box-shadow:0 0 0 1px rgba(168,84,247,.15),0 32px 64px -16px rgba(0,0,0,.5)}
+.r-panel .im{flex:0 0 600px;background:#c6bfbf}
+.r-panel .info{flex:1;position:relative;padding:48px 44px;display:flex;flex-direction:column;justify-content:center;align-items:flex-start;gap:16px;border-left:1px solid rgba(255,255,255,.06);
+  background:radial-gradient(ellipse 33px 40px at 317px 418px,rgba(27,84,131,1),rgba(27,84,131,0)) , #1e2f61}
+.r-panel .info{background:radial-gradient(ellipse 230px 150px at 53% 100%,rgba(27,84,131,.95),rgba(27,84,131,0)),#1e2f61}
+.r-badge{padding:3px 10px;border-radius:12px;border:1px solid rgba(168,85,247,.3);background:rgba(168,85,247,.14);color:#c4b5fd;font:700 11px/normal var(--sans);letter-spacing:.88px;text-transform:uppercase;white-space:nowrap}
+.r-ptitle{position:relative;top:3.6px;font:600 32px/1.2 var(--display);color:#fff}
+.r-pbody{font:400 15px/1.65 var(--sans);color:rgba(255,255,255,.65)}
+.r-pane{display:none;flex-direction:column;gap:16px;align-items:flex-start}
+.r-spot input{position:absolute;opacity:0;pointer-events:none}
+#wf1:checked~.r-panel .p1,#wf2:checked~.r-panel .p2,#wf3:checked~.r-panel .p3,#wf4:checked~.r-panel .p4,#wf5:checked~.r-panel .p5{display:flex}
+.r-thumbs{position:relative;display:flex;gap:8px;padding:6px;margin-top:16px}
+.r-thumb{position:relative;flex:1 1 0;min-height:72px;padding:12px 14px 16px;border-radius:12px;border:1px solid rgba(255,255,255,.08);overflow:hidden;cursor:pointer;
+  display:flex;flex-direction:column;justify-content:center;font:600 13px/1.4 var(--display);color:rgba(255,255,255,.55);
+  background-image:linear-gradient(173deg,rgba(255,255,255,.12) 0%,rgba(255,255,255,.02) 78%);box-shadow:inset 0 1px 0 rgba(255,255,255,.2);transition:color .2s,border-color .2s}
+.r-thumb:hover{color:#fff}
+.r-thumb i{position:absolute;left:4px;bottom:1px;height:2px;width:110px;background:linear-gradient(90deg,#04e1cb,#1469f8);opacity:0}
+#wf1:checked~.r-thumbs .t1,#wf2:checked~.r-thumbs .t2,#wf3:checked~.r-thumbs .t3,#wf4:checked~.r-thumbs .t4,#wf5:checked~.r-thumbs .t5{border-color:#04e1cb;color:#fff}
+#wf1:checked~.r-thumbs .t1 i,#wf2:checked~.r-thumbs .t2 i,#wf3:checked~.r-thumbs .t3 i,#wf4:checked~.r-thumbs .t4 i,#wf5:checked~.r-thumbs .t5 i{opacity:1}
+.r-pause{position:absolute;left:582px;top:96px;width:36px;height:36px;border-radius:18px;border:1px solid rgba(255,255,255,.15);background:rgba(255,255,255,.05);display:flex;align-items:center;justify-content:center}
+.r-pause img{width:12px;height:12px}
+
+/* section 6 */
+.r-lorem{left:286px;top:4392px;width:932px}
+
+/* section 7 */
+.r-join h2{position:absolute;left:270px;top:4892.3px;width:927px;text-align:center;font:600 64px/76px var(--display);letter-spacing:-.16px;color:#fff;font-feature-settings:"lnum" 1,"pnum" 1}
+.r-join p{position:absolute;left:439px;top:5052px;width:590px;text-align:center;font:400 18px/28px var(--sans);letter-spacing:.02px;color:#fff;white-space:nowrap}
+.r-join a{position:absolute;left:651px;top:5108px;width:165px;height:52px;border:2px solid #fff;border-radius:26px;color:#fff;text-decoration:none;display:flex;align-items:center;justify-content:center;font:700 16px/24px var(--sans);letter-spacing:.02px;transition:background .2s}
+.r-join a:hover{background:rgba(255,255,255,.16)}
+.r-join a:focus-visible{outline:2px solid #fff;outline-offset:4px}
+
+/* FAQ */
+.r-faqh{left:297px;top:5560.2px;width:840px;text-align:center;font:600 40px/48px var(--display);letter-spacing:-.13px;color:var(--ink);font-feature-settings:"lnum" 1,"pnum" 1}
+.r-faq{left:297.9px;top:5676px;width:840px}
+.r-faq details{border-bottom:1px solid #e5e5e5}
+.r-faq summary{list-style:none;cursor:pointer;display:flex;align-items:center;justify-content:space-between;min-height:79px;padding:8px 0 0;font:600 20px/28px var(--display);letter-spacing:-.06px;color:var(--ink);font-feature-settings:"lnum" 1,"pnum" 1}
+.r-faq summary::-webkit-details-marker{display:none}
+.r-faq summary::after{content:"";flex:none;width:24px;height:24px;margin-left:24px;background:url(assets/page/plus.svg) center/24px 24px no-repeat}
+.r-faq details[open] summary::after{background-image:url(assets/page/minus.svg)}
+.r-faq summary:hover::after{background-image:url(assets/page/plus-hover.svg)}
+.r-faq details[open] summary:hover::after{background-image:url(assets/page/minus-hover.svg)}
+.r-faq summary:focus-visible{outline:2px solid #0176d3;outline-offset:2px;border-radius:4px}
+.r-faq .ans{padding:0 0 32px;font:400 16px/24px var(--sans);letter-spacing:.02px;color:#181818}
+.r-faq .ans p{margin:0}
+.r-footer{left:1px;top:6623px;width:1440px;height:600px}
+/*REST-CSS-END*/
+</style>
+</head>
+<body>
+<div class="cq">
+<main class="fit" id="fit">
+<div class="stage">
+<section class="hero" aria-label="Introducing ChatGPTforce">
+  <img class="layer background" src="assets/background.svg" alt="">
+  <!-- Night-sky glow: small blue stars (the design's own blues) twinkling in four groups that are out of step -->
+  <img class="layer stars st1" src="assets/stars-1.svg" alt="" aria-hidden="true">
+  <img class="layer stars st2" src="assets/stars-2.svg" alt="" aria-hidden="true">
+  <img class="layer stars st3" src="assets/stars-3.svg" alt="" aria-hidden="true">
+  <img class="layer stars st4" src="assets/stars-4.svg" alt="" aria-hidden="true">
+  <!-- Grids-animate: faint lines + pulsing dots (each layer at 40% like the design) -->
+  <img class="layer glines" src="assets/grid-lines.svg" alt="" aria-hidden="true">
+  <svg class="gdots sm" aria-hidden="true" overflow="visible" width="1328.35" height="475.712" viewBox="0 0 1328.35 475.712" fill="none" xmlns="http://www.w3.org/2000/svg">
+<g id="sm dots">
+<path class="pulse" style="--pd:-0.5s;--pt:2.4s" id="Vector" d="M4.87629 475.646C7.56939 475.646 9.75258 473.497 9.75258 470.847C9.75258 468.196 7.56939 466.047 4.87629 466.047C2.18319 466.047 0 468.196 0 470.847C0 473.497 2.18319 475.646 4.87629 475.646Z" fill="white" fill-opacity="0.32"/>
+<path class="pulse" style="--pd:-2.8s;--pt:2.7s" id="Vector_2" d="M4.87629 10.0804C7.56939 10.0804 9.75258 7.93146 9.75258 5.28066C9.75258 2.62986 7.56939 0.480957 4.87629 0.480957C2.18319 0.480957 0 2.62986 0 5.28066C0 7.93146 2.18319 10.0804 4.87629 10.0804Z" fill="white" fill-opacity="0.3"/>
+<path class="pulse" style="--pd:-1.6s;--pt:2.2s" id="Vector_3" d="M1054.66 9.5994C1057.36 9.5994 1059.54 7.4505 1059.54 4.7997C1059.54 2.1489 1057.36 0 1054.66 0C1051.97 0 1049.79 2.1489 1049.79 4.7997C1049.79 7.4505 1051.97 9.5994 1054.66 9.5994Z" fill="white" fill-opacity="0.32"/>
+<path class="pulse" style="--pd:-3.9s;--pt:2.9s" id="Vector_4" d="M1323.47 10.5994C1326.16 10.5994 1328.35 8.4505 1328.35 5.7997C1328.35 3.1489 1326.16 1 1323.47 1C1320.78 1 1318.6 3.1489 1318.6 5.7997C1318.6 8.4505 1320.78 10.5994 1323.47 10.5994Z" fill="white" fill-opacity="0.32"/>
+<path class="pulse" style="--pd:-2.2s;--pt:2.5s" id="Vector_5" d="M1055.16 475.569C1057.85 475.569 1060.03 473.42 1060.03 470.769C1060.03 468.118 1057.85 465.969 1055.16 465.969C1052.46 465.969 1050.28 468.118 1050.28 470.769C1050.28 473.42 1052.46 475.569 1055.16 475.569Z" fill="white" fill-opacity="0.32"/>
+<path class="pulse" style="--pd:-0.9s;--pt:2.6s" id="Vector_6" d="M1323.09 475.712C1325.78 475.712 1327.96 473.563 1327.96 470.912C1327.96 468.261 1325.78 466.112 1323.09 466.112C1320.39 466.112 1318.21 468.261 1318.21 470.912C1318.21 473.563 1320.39 475.712 1323.09 475.712Z" fill="white" fill-opacity="0.32"/>
+</g>
+</svg>
+  <svg class="gdots lg" aria-hidden="true" overflow="visible" width="27.6471" height="492.67" viewBox="0 0 27.6471 492.67" fill="none" xmlns="http://www.w3.org/2000/svg">
+<g id="large dots">
+<path class="pulse" style="--pd:-1.2s;--pt:2.8s" id="Vector - ring" d="M26.8472 13.2792C26.8472 20.1712 21.1709 25.7584 14.1688 25.7584C7.16677 25.7584 1.49048 20.1712 1.49048 13.2792C1.49048 6.38709 7.16677 0.79995 14.1688 0.79995C21.1709 0.79995 26.8472 6.38709 26.8472 13.2792Z" stroke-width="1.5999" stroke="#39C5D6" stroke-opacity="0.22"/>
+<path class="pulse" style="--pd:-3.1s;--pt:2.6s" id="Vector - ring_2" d="M26.1567 479.391C26.1567 486.283 20.4804 491.87 13.4783 491.87C6.47624 491.87 0.79995 486.283 0.79995 479.391C0.79995 472.499 6.47624 466.911 13.4783 466.911C20.4804 466.911 26.1567 472.499 26.1567 479.391Z" stroke-width="1.5999" stroke="#39C5D6" stroke-opacity="0.22"/>
+<path class="pulse" style="--pd:-1.2s;--pt:2.8s" id="Vector - dot" d="M14.1692 19.7591C17.8049 19.7591 20.7522 16.8581 20.7522 13.2795C20.7522 9.70096 17.8049 6.79995 14.1692 6.79995C10.5335 6.79995 7.58623 9.70096 7.58623 13.2795C7.58623 16.8581 10.5335 19.7591 14.1692 19.7591Z" fill="#39C5D6" fill-opacity="0.5"/>
+<path class="pulse" style="--pd:-3.1s;--pt:2.6s" id="Vector - dot_2" d="M13.4787 485.871C17.1144 485.871 20.0617 482.97 20.0617 479.391C20.0617 475.812 17.1144 472.911 13.4787 472.911C9.843 472.911 6.89569 475.812 6.89569 479.391C6.89569 482.97 9.843 485.871 13.4787 485.871Z" fill="#39C5D6" fill-opacity="0.5"/>
+</g>
+</svg>
+  <img class="layer glines2" src="assets/grid-lines-2.svg" alt="" aria-hidden="true">
+    <div class="wavevec" aria-hidden="true">
+    <img src="assets/wave/g0.svg" alt="" style="left:-9.80%;top:29.18%;width:108.98%;height:68.85%">
+    <img src="assets/wave/g1.svg" alt="" style="left:-9.66%;top:28.82%;width:108.91%;height:66.52%">
+    <img src="assets/wave/g2.svg" alt="" style="left:-9.59%;top:28.46%;width:108.98%;height:64.19%">
+    <img src="assets/wave/g3.svg" alt="" style="left:-9.45%;top:27.92%;width:108.98%;height:62.04%">
+    <img src="assets/wave/g4.svg" alt="" style="left:-9.31%;top:27.57%;width:108.91%;height:59.88%">
+    <img src="assets/wave/g5.svg" alt="" style="left:-9.25%;top:27.03%;width:108.98%;height:58.09%">
+    <img src="assets/wave/g6.svg" alt="" style="left:-9.11%;top:26.49%;width:108.91%;height:58.09%">
+    <img src="assets/wave/g7.svg" alt="" style="left:-9.04%;top:26.13%;width:108.98%;height:58.09%">
+    <img src="assets/wave/g8.svg" alt="" style="left:-8.90%;top:25.59%;width:108.98%;height:58.10%">
+    <img src="assets/wave/g9.svg" alt="" style="left:-8.77%;top:25.23%;width:108.92%;height:58.10%">
+    <img src="assets/wave/g10.svg" alt="" style="left:-8.70%;top:24.70%;width:108.98%;height:58.09%">
+    <img src="assets/wave/g11.svg" alt="" style="left:-8.56%;top:24.34%;width:108.98%;height:58.09%">
+    <img src="assets/wave/g12.svg" alt="" style="left:-8.42%;top:23.80%;width:108.91%;height:58.09%">
+    <img src="assets/wave/g13.svg" alt="" style="left:-8.35%;top:23.44%;width:108.98%;height:58.09%">
+    <img src="assets/wave/g14.svg" alt="" style="left:-8.22%;top:22.90%;width:108.91%;height:58.10%">
+    <img src="assets/wave/g15.svg" alt="" style="left:-8.15%;top:22.37%;width:108.98%;height:58.09%">
+    <img src="assets/wave/g16.svg" alt="" style="left:-8.01%;top:22.01%;width:108.98%;height:58.09%">
+    <img src="assets/wave/g17.svg" alt="" style="left:-7.87%;top:21.47%;width:108.91%;height:58.09%">
+    <img src="assets/wave/g18.svg" alt="" style="left:-7.80%;top:21.11%;width:108.98%;height:58.09%">
+    <img src="assets/wave/g19.svg" alt="" style="left:-7.67%;top:20.57%;width:108.98%;height:58.10%">
+    <img src="assets/wave/g20.svg" alt="" style="left:-7.53%;top:20.22%;width:108.91%;height:58.09%">
+    <img src="assets/wave/g21.svg" alt="" style="left:-7.46%;top:18.03%;width:108.98%;height:59.74%">
+    <img src="assets/wave/g22.svg" alt="" style="left:-7.32%;top:15.78%;width:108.98%;height:61.63%">
+    <img src="assets/wave/g23.svg" alt="" style="left:-7.19%;top:13.52%;width:108.91%;height:63.35%">
+    <img src="assets/wave/g24.svg" alt="" style="left:-7.12%;top:11.22%;width:108.98%;height:65.29%">
+    <img src="assets/wave/g25.svg" alt="" style="left:-6.98%;top:8.91%;width:108.91%;height:67.07%">
+    <img src="assets/wave/g26.svg" alt="" style="left:-6.91%;top:6.59%;width:108.98%;height:68.85%">
+    <img src="assets/wave/g0.svg" alt="" style="left:-9.80%;top:29.18%;width:108.98%;height:68.85%" class="dd">
+    <img src="assets/wave/g1.svg" alt="" style="left:-9.66%;top:28.82%;width:108.91%;height:66.52%" class="dd">
+    <img src="assets/wave/g2.svg" alt="" style="left:-9.59%;top:28.46%;width:108.98%;height:64.19%" class="dd">
+    <img src="assets/wave/g3.svg" alt="" style="left:-9.45%;top:27.92%;width:108.98%;height:62.04%" class="dd">
+    <img src="assets/wave/g4.svg" alt="" style="left:-9.31%;top:27.57%;width:108.91%;height:59.88%" class="dd">
+    <img src="assets/wave/g5.svg" alt="" style="left:-9.25%;top:27.03%;width:108.98%;height:58.09%" class="dd">
+    <img src="assets/wave/g6.svg" alt="" style="left:-9.11%;top:26.49%;width:108.91%;height:58.09%" class="dd">
+    <img src="assets/wave/g7.svg" alt="" style="left:-9.04%;top:26.13%;width:108.98%;height:58.09%" class="dd">
+    <img src="assets/wave/g8.svg" alt="" style="left:-8.90%;top:25.59%;width:108.98%;height:58.10%" class="dd">
+    <img src="assets/wave/g9.svg" alt="" style="left:-8.77%;top:25.23%;width:108.92%;height:58.10%" class="dd">
+    <img src="assets/wave/g10.svg" alt="" style="left:-8.70%;top:24.70%;width:108.98%;height:58.09%" class="dd">
+    <img src="assets/wave/g11.svg" alt="" style="left:-8.56%;top:24.34%;width:108.98%;height:58.09%" class="dd">
+    <img src="assets/wave/g12.svg" alt="" style="left:-8.42%;top:23.80%;width:108.91%;height:58.09%" class="dd">
+    <img src="assets/wave/g13.svg" alt="" style="left:-8.35%;top:23.44%;width:108.98%;height:58.09%" class="dd">
+    <img src="assets/wave/g14.svg" alt="" style="left:-8.22%;top:22.90%;width:108.91%;height:58.10%" class="dd">
+    <img src="assets/wave/g15.svg" alt="" style="left:-8.15%;top:22.37%;width:108.98%;height:58.09%" class="dd">
+    <img src="assets/wave/g16.svg" alt="" style="left:-8.01%;top:22.01%;width:108.98%;height:58.09%" class="dd">
+    <img src="assets/wave/g17.svg" alt="" style="left:-7.87%;top:21.47%;width:108.91%;height:58.09%" class="dd">
+    <img src="assets/wave/g18.svg" alt="" style="left:-7.80%;top:21.11%;width:108.98%;height:58.09%" class="dd">
+    <img src="assets/wave/g19.svg" alt="" style="left:-7.67%;top:20.57%;width:108.98%;height:58.10%" class="dd">
+    <img src="assets/wave/g20.svg" alt="" style="left:-7.53%;top:20.22%;width:108.91%;height:58.09%" class="dd">
+    <img src="assets/wave/g21.svg" alt="" style="left:-7.46%;top:18.03%;width:108.98%;height:59.74%" class="dd">
+    <img src="assets/wave/g22.svg" alt="" style="left:-7.32%;top:15.78%;width:108.98%;height:61.63%" class="dd">
+    <img src="assets/wave/g23.svg" alt="" style="left:-7.19%;top:13.52%;width:108.91%;height:63.35%" class="dd">
+    <img src="assets/wave/g24.svg" alt="" style="left:-7.12%;top:11.22%;width:108.98%;height:65.29%" class="dd">
+    <img src="assets/wave/g25.svg" alt="" style="left:-6.98%;top:8.91%;width:108.91%;height:67.07%" class="dd">
+    <img src="assets/wave/g26.svg" alt="" style="left:-6.91%;top:6.59%;width:108.98%;height:68.85%" class="dd">
+    <img src="assets/wave/h27.svg" alt="" style="left:-9.66%;top:30.61%;width:108.91%;height:64.01%">
+    <img src="assets/wave/h28.svg" alt="" style="left:-9.59%;top:32.23%;width:108.98%;height:59.17%">
+    <img src="assets/wave/h29.svg" alt="" style="left:-9.45%;top:33.66%;width:108.98%;height:54.51%">
+    <img src="assets/wave/h30.svg" alt="" style="left:-9.31%;top:35.10%;width:108.91%;height:49.84%">
+    <img src="assets/wave/h31.svg" alt="" style="left:-9.25%;top:36.71%;width:108.98%;height:45.00%">
+    <img src="assets/wave/h32.svg" alt="" style="left:-9.11%;top:38.14%;width:108.91%;height:40.35%">
+    <img src="assets/wave/h33.svg" alt="" style="left:-9.04%;top:39.58%;width:108.98%;height:35.68%">
+    <img src="assets/wave/h34.svg" alt="" style="left:-8.90%;top:41.19%;width:108.98%;height:30.84%">
+    <img src="assets/wave/h35.svg" alt="" style="left:-8.77%;top:42.27%;width:108.92%;height:27.07%">
+    <img src="assets/wave/h36.svg" alt="" style="left:-8.70%;top:42.99%;width:108.98%;height:23.84%">
+    <img src="assets/wave/h37.svg" alt="" style="left:-8.56%;top:42.09%;width:108.98%;height:23.85%">
+    <img src="assets/wave/h38.svg" alt="" style="left:-8.42%;top:41.19%;width:108.91%;height:23.85%">
+    <img src="assets/wave/h39.svg" alt="" style="left:-8.35%;top:40.30%;width:108.98%;height:24.02%">
+    <img src="assets/wave/h40.svg" alt="" style="left:-8.22%;top:39.58%;width:108.91%;height:23.85%">
+    <img src="assets/wave/h41.svg" alt="" style="left:-8.15%;top:38.68%;width:108.98%;height:23.85%">
+    <img src="assets/wave/h42.svg" alt="" style="left:-8.01%;top:37.79%;width:108.98%;height:23.84%">
+    <img src="assets/wave/h43.svg" alt="" style="left:-7.87%;top:35.28%;width:108.91%;height:27.07%">
+    <img src="assets/wave/h44.svg" alt="" style="left:-7.80%;top:32.41%;width:108.98%;height:31.02%">
+    <img src="assets/wave/h45.svg" alt="" style="left:-7.67%;top:29.18%;width:108.98%;height:35.86%">
+    <img src="assets/wave/h46.svg" alt="" style="left:-7.53%;top:25.95%;width:108.91%;height:40.52%">
+    <img src="assets/wave/h47.svg" alt="" style="left:-7.46%;top:22.73%;width:108.98%;height:45.18%">
+    <img src="assets/wave/h48.svg" alt="" style="left:-7.32%;top:19.50%;width:108.98%;height:49.84%">
+    <img src="assets/wave/h49.svg" alt="" style="left:-7.19%;top:16.45%;width:108.91%;height:54.51%">
+    <img src="assets/wave/h50.svg" alt="" style="left:-7.12%;top:13.22%;width:108.98%;height:59.17%">
+    <img src="assets/wave/h51.svg" alt="" style="left:-6.98%;top:9.99%;width:108.91%;height:63.83%">
+    <img src="assets/wave/h27.svg" alt="" style="left:-9.66%;top:30.61%;width:108.91%;height:64.01%" class="dd">
+    <img src="assets/wave/h28.svg" alt="" style="left:-9.59%;top:32.23%;width:108.98%;height:59.17%" class="dd">
+    <img src="assets/wave/h29.svg" alt="" style="left:-9.45%;top:33.66%;width:108.98%;height:54.51%" class="dd">
+    <img src="assets/wave/h30.svg" alt="" style="left:-9.31%;top:35.10%;width:108.91%;height:49.84%" class="dd">
+    <img src="assets/wave/h31.svg" alt="" style="left:-9.25%;top:36.71%;width:108.98%;height:45.00%" class="dd">
+    <img src="assets/wave/h32.svg" alt="" style="left:-9.11%;top:38.14%;width:108.91%;height:40.35%" class="dd">
+    <img src="assets/wave/h33.svg" alt="" style="left:-9.04%;top:39.58%;width:108.98%;height:35.68%" class="dd">
+    <img src="assets/wave/h34.svg" alt="" style="left:-8.90%;top:41.19%;width:108.98%;height:30.84%" class="dd">
+    <img src="assets/wave/h35.svg" alt="" style="left:-8.77%;top:42.27%;width:108.92%;height:27.07%" class="dd">
+    <img src="assets/wave/h36.svg" alt="" style="left:-8.70%;top:42.99%;width:108.98%;height:23.84%" class="dd">
+    <img src="assets/wave/h37.svg" alt="" style="left:-8.56%;top:42.09%;width:108.98%;height:23.85%" class="dd">
+    <img src="assets/wave/h38.svg" alt="" style="left:-8.42%;top:41.19%;width:108.91%;height:23.85%" class="dd">
+    <img src="assets/wave/h39.svg" alt="" style="left:-8.35%;top:40.30%;width:108.98%;height:24.02%" class="dd">
+    <img src="assets/wave/h40.svg" alt="" style="left:-8.22%;top:39.58%;width:108.91%;height:23.85%" class="dd">
+    <img src="assets/wave/h41.svg" alt="" style="left:-8.15%;top:38.68%;width:108.98%;height:23.85%" class="dd">
+    <img src="assets/wave/h42.svg" alt="" style="left:-8.01%;top:37.79%;width:108.98%;height:23.84%" class="dd">
+    <img src="assets/wave/h43.svg" alt="" style="left:-7.87%;top:35.28%;width:108.91%;height:27.07%" class="dd">
+    <img src="assets/wave/h44.svg" alt="" style="left:-7.80%;top:32.41%;width:108.98%;height:31.02%" class="dd">
+    <img src="assets/wave/h45.svg" alt="" style="left:-7.67%;top:29.18%;width:108.98%;height:35.86%" class="dd">
+    <img src="assets/wave/h46.svg" alt="" style="left:-7.53%;top:25.95%;width:108.91%;height:40.52%" class="dd">
+    <img src="assets/wave/h47.svg" alt="" style="left:-7.46%;top:22.73%;width:108.98%;height:45.18%" class="dd">
+    <img src="assets/wave/h48.svg" alt="" style="left:-7.32%;top:19.50%;width:108.98%;height:49.84%" class="dd">
+    <img src="assets/wave/h49.svg" alt="" style="left:-7.19%;top:16.45%;width:108.91%;height:54.51%" class="dd">
+    <img src="assets/wave/h50.svg" alt="" style="left:-7.12%;top:13.22%;width:108.98%;height:59.17%" class="dd">
+    <img src="assets/wave/h51.svg" alt="" style="left:-6.98%;top:9.99%;width:108.91%;height:63.83%" class="dd">
+    <div class="ell" style="left:12.93%;top:12.02%;width:35.64%;height:84.31%"><img src="assets/wave/e0.svg" alt="" style="left:-27.48%;top:-30.34%;width:154.96%;height:160.68%"></div>
+    <div class="ell" style="left:39.18%;top:8.36%;width:49.34%;height:95.83%"><img src="assets/wave/e1.svg" alt="" style="left:-19.85%;top:-26.69%;width:139.7%;height:153.38%"></div>
+  </div>
+
+  <!-- Floating icons (decorative) -->
+  <div class="icon alfred"    data-name="alfred_neutral 1" aria-hidden="true"><img src="assets/alfred.png" alt=""></div>
+  <div class="icon tableau"   data-name="Tableau" aria-hidden="true"><img src="assets/tableau.png" alt=""></div>
+  <div class="icon mulesoft"  data-name="MuleSoft" aria-hidden="true"><img src="assets/mulesoft.png" alt=""></div>
+  <div class="icon spark"     data-name="BE-MVP-Icon-Spark_Redux_V3_LEFT_yellow" aria-hidden="true"><img src="assets/spark.png" alt=""></div>
+  <!-- "purple shadow" layers from Figma: soft #201B89 glows behind the headline and the sub head / body copy so the text reads clearly over the wave -->
+  <div class="pshadow" style="left:214.76px;top:175.3px;width:485.24px;height:111.52px" aria-hidden="true"></div>
+  <div class="pshadow" style="left:712.29px;top:175.3px;width:485.24px;height:111.52px" aria-hidden="true"></div>
+  <div class="pshadow" style="left:410px;top:300.1px;width:635.24px;height:130.2px" aria-hidden="true"></div>
+
+    <div class="lockup" role="img" aria-label="Salesforce × OpenAI">
+    <img src="assets/lockup/v0.svg" alt="" style="left:0.42%;top:5.52%;width:40.96%;height:90.69%">
+    <img src="assets/lockup/v1.svg" alt="" style="left:6.36%;top:41.97%;width:2.84%;height:12.24%">
+    <img src="assets/lockup/v2.svg" alt="" style="left:18.65%;top:41.97%;width:2.84%;height:12.24%">
+    <img src="assets/lockup/v3.svg" alt="" style="left:24.44%;top:42.02%;width:3.41%;height:12.14%">
+    <img src="assets/lockup/v4.svg" alt="" style="left:30.80%;top:42.04%;width:2.89%;height:12.15%">
+    <img src="assets/lockup/v5.svg" alt="" style="left:33.91%;top:42.02%;width:3.29%;height:12.09%">
+    <img src="assets/lockup/v6.svg" alt="" style="left:14.91%;top:42.02%;width:3.30%;height:12.09%">
+    <img src="assets/lockup/v7.svg" alt="" style="left:9.63%;top:42.02%;width:3.07%;height:12.17%">
+    <img src="assets/lockup/v8.svg" alt="" style="left:28.48%;top:42.13%;width:2.21%;height:11.79%">
+    <img src="assets/lockup/v9.svg" alt="" style="left:20.73%;top:37.19%;width:4.17%;height:22.10%">
+    <img src="assets/lockup/v10.svg" alt="" style="left:13.46%;top:37.44%;width:0.77%;height:16.48%">
+    <img src="assets/lockup/v11.svg" alt="" style="left:49.69%;top:37.27%;width:6.94%;height:21.97%">
+    <img src="assets/lockup/v12.svg" alt="" style="left:64.98%;top:36.87%;width:7.18%;height:22.71%">
+    <img src="assets/lockup/v13.svg" alt="" style="left:72.89%;top:43.18%;width:5.39%;height:22.41%">
+    <img src="assets/lockup/v14.svg" alt="" style="left:78.80%;top:43.18%;width:5.04%;height:16.40%">
+    <img src="assets/lockup/v15.svg" alt="" style="left:84.53%;top:43.15%;width:4.66%;height:16.11%">
+    <img src="assets/lockup/v16.svg" alt="" style="left:89.69%;top:37.19%;width:7.21%;height:22.10%">
+    <img src="assets/lockup/v17.svg" alt="" style="left:97.42%;top:37.19%;width:1.32%;height:22.10%">
+  </div>
+  <h1 class="intro">Introducing<span class="sr-only"> ChatGPTforce</span></h1>
+  <img class="layer headline" src="assets/headline-union.svg" alt="" aria-hidden="true">
+  <h2 class="subhead">The #1 AI CRM, now hands-free in ChatGPT</h2>
+  <p class="body">ChatGPTforce brings the power of Salesforce into ChatGPT.<br>Now you can just talk to ChatGPT and put Salesforce to work.</p>
+  <a class="cta" href="#join-the-beta"><span>Join the beta</span></a>
+
+  <header class="gnav" role="banner">
+    <a class="gn-logo" href="#" aria-label="Salesforce"><img src="assets/lockup/v0.svg" alt="" style="left:0.42%;top:5.52%;width:40.96%;height:90.69%"><img src="assets/lockup/v1.svg" alt="" style="left:6.36%;top:41.97%;width:2.84%;height:12.24%"><img src="assets/lockup/v2.svg" alt="" style="left:18.65%;top:41.97%;width:2.84%;height:12.24%"><img src="assets/lockup/v3.svg" alt="" style="left:24.44%;top:42.02%;width:3.41%;height:12.14%"><img src="assets/lockup/v4.svg" alt="" style="left:30.80%;top:42.04%;width:2.89%;height:12.15%"><img src="assets/lockup/v5.svg" alt="" style="left:33.91%;top:42.02%;width:3.29%;height:12.09%"><img src="assets/lockup/v6.svg" alt="" style="left:14.91%;top:42.02%;width:3.30%;height:12.09%"><img src="assets/lockup/v7.svg" alt="" style="left:9.63%;top:42.02%;width:3.07%;height:12.17%"><img src="assets/lockup/v8.svg" alt="" style="left:28.48%;top:42.13%;width:2.21%;height:11.79%"><img src="assets/lockup/v9.svg" alt="" style="left:20.73%;top:37.19%;width:4.17%;height:22.10%"><img src="assets/lockup/v10.svg" alt="" style="left:13.46%;top:37.44%;width:0.77%;height:16.48%"></a>
+    <nav class="gn-links" aria-label="Primary">
+      <a href="#" style="left:119px">Products</a><a href="#" style="left:201px">Industries</a><a href="#" style="left:290px">Customers</a><a href="#" style="left:383px">Events</a><a href="#" style="left:449px">Learning</a><a href="#" style="left:529px">Support</a><a href="#" style="left:605px">Company</a>
+    </nav>
+    <a class="gn-contact" href="#">Contact Us</a>
+    <svg class="gn-globe" viewBox="0 0 16 16" aria-label="Language" role="img"><g fill="none" stroke="currentColor" stroke-width="1.3"><circle cx="8" cy="8" r="6.6"/><ellipse cx="8" cy="8" rx="2.9" ry="6.6"/><path d="M1.4 8h13.2M2.4 4.7h11.2M2.4 11.3h11.2"/></g></svg>
+    <a class="gn-login" href="#"><svg viewBox="0 0 16 16" aria-hidden="true"><circle cx="8" cy="4.6" r="3.3" fill="currentColor"/><path d="M1.2 15c0-3.6 2.9-5.6 6.8-5.6s6.8 2 6.8 5.6z" fill="currentColor"/></svg>Login</a>
+    <a class="gn-cta" href="#">Get started</a>
+  </header>
+
+  <div class="icon marketing" data-name="Marketing Cloud" aria-hidden="true"><img src="assets/marketing.png" alt=""></div>
+  <div class="icon sales"     data-name="Sales Cloud" aria-hidden="true"><img src="assets/sales.png" alt=""></div>
+  <div class="icon jojo"      data-name="jojo_neutral 1" aria-hidden="true"><img src="assets/jojo.png" alt=""></div>
+</section>
+<!--REST-START-->
+<div class="rest" id="rest">
+  <div class="a r-fill" aria-hidden="true"></div>
+  <div class="r-lower" id="lower">
+  <img class="a r-bg" src="assets/page/bg.svg" alt="" aria-hidden="true">
+  <!-- 4 – Quotes -->
+  <figure class="a r-q" style="left:0;top:0;width:1440px;height:0;margin:0">
+    <div class="r-photo a" style="left:228px;top:2447px;width:322px;height:322px"><img src="assets/page/marc.png" alt="Marc Benioff" style="left:0;top:0;width:322px;height:322px;object-fit:cover"></div>
+    <img class="mk" src="assets/page/quote.svg" alt="" style="left:628px;top:2458px">
+    <blockquote class="qt" style="left:630px;top:2500.6px;width:640px;margin:0">Salesforce brings the trusted customer data, business workflows, and enterprise intelligence. OpenAI brings incredible frontier AI models and voice capabilities,”</blockquote>
+    <figcaption class="nm" style="left:628px;top:2686.1px">Marc Benioff</figcaption>
+    <div class="rl" style="left:628px;top:2716.7px">Chair and CEO, Salesforce.</div>
+  </figure>
+  <figure class="a r-q" style="left:0;top:0;width:1440px;height:0;margin:0">
+    <img class="mk" src="assets/page/quote.svg" alt="" style="left:226px;top:2882px">
+    <blockquote class="qt" style="left:226px;top:2931.6px;width:655px;margin:0">Salesforce and OpenAI are focused on delivering for the same personas – the salesperson, the RevOps leader, the marketer. Proactive work via dots means people can do real work alongside AI.”</blockquote>
+    <figcaption class="nm" style="left:226px;top:3160.1px">Sam Altman</figcaption>
+    <div class="rl" style="left:226px;top:3190.5px">CEO, OpenAI</div>
+    <div class="r-photo a" style="left:921px;top:2886px;width:322px;height:322px"><img src="assets/page/sam.png" alt="Sam Altman" style="left:0;top:0;width:322px;height:322px;object-fit:cover"></div>
+  </figure>
+
+  <!-- 5 – One connected workflow -->
+  <img class="a" src="assets/page/wave-mid.png" alt="" aria-hidden="true" style="left:0;top:3220px;width:1440px;height:563px">
+  <h2 class="a dsp r-h2 r-grad r-title5" style="line-height:.99">One connected workflow<br>from campaign to<br>opportunity to quote.</h2>
+  <div class="a r-spot" role="group" aria-label="Workflow steps">
+    <input type="radio" name="wf" id="wf1" checked><input type="radio" name="wf" id="wf2"><input type="radio" name="wf" id="wf3"><input type="radio" name="wf" id="wf4"><input type="radio" name="wf" id="wf5">
+    <div class="r-panel">
+      <div class="im" role="img" aria-label="Workflow image placeholder"></div>
+      <div class="info">
+        <div class="r-pane p1"><span class="r-badge">loremipsom</span><h3 class="r-ptitle">Build campaign lorem ipsom</h3><p class="r-pbody">Lorem ipsum dolor sit amet, consectetur adipiscing elit. Phasellus id neque est. Nullam sit amet scelerisque turpis.</p></div>
+        <div class="r-pane p2"><span class="r-badge">loremipsom</span><h3 class="r-ptitle">Spot intent lorem ipsom</h3><p class="r-pbody">Lorem ipsum dolor sit amet, consectetur adipiscing elit. Phasellus id neque est. Nullam sit amet scelerisque turpis.</p></div>
+        <div class="r-pane p3"><span class="r-badge">loremipsom</span><h3 class="r-ptitle">Win the meeting lorem ipsom</h3><p class="r-pbody">Lorem ipsum dolor sit amet, consectetur adipiscing elit. Phasellus id neque est. Nullam sit amet scelerisque turpis.</p></div>
+        <div class="r-pane p4"><span class="r-badge">loremipsom</span><h3 class="r-ptitle">Create quote lorem ipsom</h3><p class="r-pbody">Lorem ipsum dolor sit amet, consectetur adipiscing elit. Phasellus id neque est. Nullam sit amet scelerisque turpis.</p></div>
+        <div class="r-pane p5"><span class="r-badge">loremipsom</span><h3 class="r-ptitle">Approval lorem ipsom</h3><p class="r-pbody">Lorem ipsum dolor sit amet, consectetur adipiscing elit. Phasellus id neque est. Nullam sit amet scelerisque turpis.</p></div>
+      </div>
+    </div>
+    <div class="r-thumbs">
+      <label class="r-thumb t1" for="wf1">Build Campaign<i></i></label>
+      <label class="r-thumb t2" for="wf2">Spot Intent<i></i></label>
+      <label class="r-thumb t3" for="wf3">Win the Meeting<i></i></label>
+      <label class="r-thumb t4" for="wf4">Create Quote<i></i></label>
+      <label class="r-thumb t5" for="wf5">Approval<i></i></label>
+    </div>
+    <div class="r-pause" aria-hidden="true"><img src="assets/page/pause.svg" alt=""></div>
+  </div>
+
+  <!-- 6 – Customer zero quote -->
+  <figure class="a r-q" style="left:0;top:0;width:1440px;height:0;margin:0">
+    <img class="mk" src="assets/page/quote.svg" alt="" style="left:286px;top:4396px">
+    <blockquote class="qt" style="left:286px;top:4445.6px;width:932px;margin:0">Lorem ipsum dolor sit amet, consectetur adipiscing elit. Cras a eleifend magna. Vestibulum ante ipsum primis in faucibus orci luctus et ultrices posuere cubilia curaeLorem ipsum dolor sit amet, consectetur adipiscing elit.</blockquote>
+    <figcaption class="nm" style="left:286px;top:4644.1px">John Smith</figcaption>
+    <div class="rl" style="left:286px;top:4674.7px">CEO, lorem ipsom</div>
+  </figure>
+
+  <!-- 7 – Join the waitlist -->
+  <div class="r-join">
+    <h2>Get notified when Salesforce in ChatGPT beta opens</h2>
+    <p>Join the wait list and we will let you know the moment the beta opens.</p>
+    <a href="#join-the-beta">Join the beta</a>
+  </div>
+  <img class="a r-contour" src="assets/page/contour.svg" alt="" aria-hidden="true">
+
+  <!-- 8 – FAQ and footer -->
+  <h2 class="a r-faqh">Frequently Asked Questions&nbsp;<br>about ChatGPTforce</h2>
+  <div class="a r-faq">
+    <details><summary>What is ChatGPTforce?</summary><div class="ans"><p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Donec leo nisi, viverra in gravida id, congue vitae libero. Mauris faucibus risus ac libero facilisis, ac ullamcorper diam ultrices. Fusce id nunc auctor, fringilla turpis vel, porta augue. Donec sapien massa, elementum vitae elit efficitur, tristique accumsan dui.</p></div></details>
+    <details open><summary>What is the Salesforce and OpenAI partnership?</summary><div class="ans"><p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Donec leo nisi, viverra in gravida id, congue vitae libero. Mauris faucibus risus ac libero facilisis, ac ullamcorper diam ultrices. Fusce id nunc auctor, fringilla turpis vel, porta augue. Donec sapien massa, elementum vitae elit efficitur, tristique accumsan dui.</p></div></details>
+    <details><summary>What is lorem ipsum dolor sit amet?</summary><div class="ans"><p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Donec leo nisi, viverra in gravida id, congue vitae libero. Mauris faucibus risus ac libero facilisis, ac ullamcorper diam ultrices. Fusce id nunc auctor, fringilla turpis vel, porta augue. Donec sapien massa, elementum vitae elit efficitur, tristique accumsan dui.</p></div></details>
+    <details><summary>What is lorem ipsum dolor sit?</summary><div class="ans"><p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Donec leo nisi, viverra in gravida id, congue vitae libero. Mauris faucibus risus ac libero facilisis, ac ullamcorper diam ultrices. Fusce id nunc auctor, fringilla turpis vel, porta augue. Donec sapien massa, elementum vitae elit efficitur, tristique accumsan dui.</p></div></details>
+    <details><summary>How does lorem ipsum dolor sit amet, consectetur adipiscing elit?</summary><div class="ans"><p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Donec leo nisi, viverra in gravida id, congue vitae libero. Mauris faucibus risus ac libero facilisis, ac ullamcorper diam ultrices. Fusce id nunc auctor, fringilla turpis vel, porta augue. Donec sapien massa, elementum vitae elit efficitur, tristique accumsan dui.</p></div></details>
+    <details><summary>Can I ipsum dolor sit amet, consectetur?</summary><div class="ans"><p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Donec leo nisi, viverra in gravida id, congue vitae libero. Mauris faucibus risus ac libero facilisis, ac ullamcorper diam ultrices. Fusce id nunc auctor, fringilla turpis vel, porta augue. Donec sapien massa, elementum vitae elit efficitur, tristique accumsan dui.</p></div></details>
+    <details><summary>How does psum dolor sit amet, consectetur?</summary><div class="ans"><p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Donec leo nisi, viverra in gravida id, congue vitae libero. Mauris faucibus risus ac libero facilisis, ac ullamcorper diam ultrices. Fusce id nunc auctor, fringilla turpis vel, porta augue. Donec sapien massa, elementum vitae elit efficitur, tristique accumsan dui.</p></div></details>
+    <details><summary>What psum dolor sit amet, consectetur?</summary><div class="ans"><p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Donec leo nisi, viverra in gravida id, congue vitae libero. Mauris faucibus risus ac libero facilisis, ac ullamcorper diam ultrices. Fusce id nunc auctor, fringilla turpis vel, porta augue. Donec sapien massa, elementum vitae elit efficitur, tristique accumsan dui.</p></div></details>
+    <details><summary>Which psum dolor sit amet, consectetur?</summary><div class="ans"><p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Donec leo nisi, viverra in gravida id, congue vitae libero. Mauris faucibus risus ac libero facilisis, ac ullamcorper diam ultrices. Fusce id nunc auctor, fringilla turpis vel, porta augue. Donec sapien massa, elementum vitae elit efficitur, tristique accumsan dui.</p></div></details>
+    <details><summary>How do I psum dolor sit amet, consectetur?</summary><div class="ans"><p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Donec leo nisi, viverra in gravida id, congue vitae libero. Mauris faucibus risus ac libero facilisis, ac ullamcorper diam ultrices. Fusce id nunc auctor, fringilla turpis vel, porta augue. Donec sapien massa, elementum vitae elit efficitur, tristique accumsan dui.</p></div></details>
+  </div>
+  <img class="a r-footer" src="assets/page/footer.png" alt="Salesforce footer: product, company and popular links, social links, legal and privacy links">
+  </div>
+  <div class="a r-top" aria-hidden="true"></div>
+  <!-- video poster ("Your data") -->
+  <button class="a r-video" type="button" aria-label="Play video: Your data"><img src="assets/page/video-poster.png" alt=""></button>
+
+  <!-- 3 – Your CRM is now a conversation -->
+  <img class="a" src="assets/page/wave-top.png" alt="" aria-hidden="true" style="left:-3px;top:496px;width:1443px;height:769px">
+  <h2 class="a dsp r-h2 r-grad r-title3">Your CRM is now&nbsp;<br>a conversation</h2>
+  <p class="a r-para3">ChatGPT makes Salesforce easier to work with. Salesforce makes ChatGPT more useful for business. OpenAI brings natural conversation and proactive AI agents. Salesforce brings the customer data, workflows, business logic, and controls that let those experiences get work done.</p>
+  <button class="a r-demo" type="button" aria-label="Play demo video"><span class="lbl">Demo video</span><img src="assets/page/play.svg" alt=""></button>
+  <h2 class="a dsp r-easier">It’s easier than ever to get real AI value, fast</h2>
+
+  <!-- scroll-stack cards: they pin while you scroll and each next card slides up over the last -->
+  <div class="a r-stack" id="stack" style="left:0;top:1788px">
+    <div class="r-pin" id="pin">
+      <div class="r-nav" aria-hidden="true"><span class="r-pill"></span><span class="nv nv-dots">Dots</span><span class="nv nv-tableau">Tableau</span><span class="nv nv-ads">OpenAI Ads</span><span class="nv nv-mule">MuleSoft</span></div>
+      <article class="r-card r-sc sc-dd" data-i="0">
+        <div class="dd-tile"><img src="assets/page/dots-tile.svg" alt=""></div>
+        <div class="hd" aria-hidden="true">Put Dots to Work</div>
+        <h3>Put Dots to Work</h3>
+        <p>Work doesn't stop when a ChatGPT conversation ends. OpenAI dots are proactive agents working with your Salesforce context and trusted guardrails. They collaborate like a colleague in Slack, working toward ongoing goals. They can get pipeline updates, triage customer requests, help prepare for a meeting, or approve a change.</p>
+        <div class="ph"></div>
+      </article>
+      <article class="r-card r-sc sc-n sc-tableau" data-i="1">
+        <div class="tile"><img src="assets/page/openai.svg" alt=""></div>
+        <div class="hd" aria-hidden="true">Ask More of Your Data with Tableau</div>
+        <h3>Ask More of Your Data<br>with Tableau</h3>
+        <p style="top:223.6px">With the Tableau plugin, people ask business questions in ChatGPT, explore trusted metrics, and get visual explanations. Leaders can investigate changing performance without hunting for the right dashboard. And users can create or update Tableau workbooks in ChatGPT and publish them back in Tableau, so insights can be used by the whole team.</p>
+        <div class="ph"></div>
+      </article>
+      <article class="r-card r-sc sc-n sc-ads" data-i="2">
+        <div class="tile"><img src="assets/page/openai.svg" alt=""></div>
+        <div class="hd" aria-hidden="true">Connect Marketing Performance to OpenAI Ads</div>
+        <h3>Connect Marketing<br>Performance to<br>OpenAI Ads</h3>
+        <p style="top:275.6px">A live Conversions API connects authorized Salesforce data to OpenAI’s ads platform. Planned Marketing Cloud and Data 360 integrations will let advertisers build audiences, manage campaigns, activate ads in ChatGPT, and attribute conversions. Commerce Cloud merchants can already sync product catalogs with ChatGPT to reach new consumers.</p>
+        <div class="ph"></div>
+      </article>
+      <article class="r-card r-sc sc-n sc-mule" data-i="3">
+        <div class="tile"><img src="assets/page/openai.svg" alt=""></div>
+        <div class="hd" aria-hidden="true">Extend AI Across the Enterprise with MuleSoft</div>
+        <h3>Extend AI Across the<br>Enterprise with MuleSoft</h3>
+        <p style="top:223.6px">The Salesforce in ChatGPT plugin uses existing Salesforce permissions to control what employees see and do. People review and approve changes, so work starts in ChatGPT but stays within existing controls. MuleSoft MCP Bridge turns APIs into governed MCP tools without rewriting services, letting companies securely expose workflows to AI.</p>
+        <div class="ph"></div>
+      </article>
+    </div>
+  </div>
+</div>
+<!--REST-END-->
+</div>
+</main>
+</div>
+<script>
+// The page width is locked to the browser width in CSS (see .fit above). This script only steps in for very old browsers
+// that can't do that maths, and sets the same scale from the window width instead.
+(function(){
+  var fit=document.getElementById('fit');
+  if(!(window.CSS&&CSS.supports&&CSS.supports('width','calc(tan(atan2(1px,1px)) * 1px)')&&CSS.supports('width','1cqw'))){
+    var size=function(){fit.style.setProperty('--s',document.documentElement.clientWidth/1440)};
+    size(); addEventListener('resize',size);
+  }
+  // CTA placeholder: swap for the real beta sign-up URL
+  document.querySelector('.cta').addEventListener('click',function(e){e.preventDefault();location.hash='join-the-beta';});
+})();
+
+
+</script>
+<script>
+/*STACK-JS*/
+/* Scroll-stack cards. The tall track scrolls normally; while you move through it the card window stays pinned
+   and each next card slides up over the previous ones (which tuck back, scale down and dim a little). */
+(function(){
+  var stack=document.getElementById('stack'); if(!stack) return;
+  var pin=document.getElementById('pin'), stage=document.querySelector('.stage');
+  var cards=[].slice.call(stack.querySelectorAll('.r-sc')), N=cards.length;
+  var hds=cards.map(function(c){return c.querySelector('.hd');}), ho=[];            // one-line titles that show in the strips
+  var PEEK=54, CARD=480, WIN=CARD+PEEK*(N-1), PINH=WIN;         // card height, strip shown per card behind, window height (ends flush with the last card)
+  var A=520, T0=80, Z=A*(N-1);                                 // scroll per card, where it pins (from the top of the screen), total. A, PEEK and the 220px end pause are repeated in tools/build_rest.py, which sizes the page for N cards
+  var TRACK=stack.offsetHeight, MAXPIN=TRACK-PINH;
+  var ACTIVE=['dots','tableau','ads','mule'];                  // which side label is highlighted for each card
+  var active=null, ticking=false;
+  stack.classList.add('js'); stack.setAttribute('data-active','dots');
+  function frame(){
+    ticking=false;
+    var sc=stage.getBoundingClientRect().width/1440, r=stack.getBoundingClientRect();
+    var raw=(T0*sc-r.top)/sc;                                  // local px scrolled past the pin line
+    var pinY=Math.min(Math.max(raw,0),MAXPIN), z=Math.min(Math.max(raw,0),Z), t=[0], i, j;
+    pin.style.transform='translate3d(0,'+pinY+'px,0)';
+    var start=Math.max(PINH+4,window.innerHeight/sc-T0+24);      // far enough down to be off-screen
+    for(i=1;i<N;i++) t[i]=Math.min(Math.max((z-(i-1)*A)/A,0),1);   // how far card i has slid in (0..1)
+    for(i=0;i<N;i++){
+      var depth=0; for(j=i+1;j<N;j++) depth+=t[j];              // how many cards now sit on top of this one
+      var y=i===0?0:PEEK*i+(1-t[i])*(start-PEEK*i);            // slides up from below the bottom of the screen
+      cards[i].style.transform='translate3d(0,'+y+'px,0) scale('+(1-0.04*depth)+')';
+      cards[i].style.filter=depth>0.001?'brightness('+(1-0.06*depth)+')':'';
+      if(hds[i]){var o=i<N-1?Math.min(1,Math.max(0,(t[i+1]-.9)/.1)):0;   // shows once the next card has (almost) covered the big title
+        if(o!==ho[i]){ho[i]=o;hds[i].style.opacity=o;}}
+    }
+    var a=ACTIVE[Math.min(N-1,Math.round(z/A))];
+    if(a!==active){active=a;stack.setAttribute('data-active',a);}
+  }
+  function req(){ if(!ticking){ticking=true;requestAnimationFrame(frame);} }
+  addEventListener('scroll',req,{passive:true}); addEventListener('resize',req); frame();
+})();
+/*STACK-JS-END*/
+</script>
+</body>
+</html>

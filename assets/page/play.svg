@@ -1,0 +1,9 @@
+<svg preserveAspectRatio="none" overflow="visible" style="display: block;" width="69.8022" height="69.8022" viewBox="0 0 69.8022 69.8022" fill="none" xmlns="http://www.w3.org/2000/svg">
+<g id="Video Play">
+<foreignObject x="-11.1684" y="-11.1684" width="92.139" height="92.139"><div xmlns="http://www.w3.org/1999/xhtml" style="backdrop-filter:blur(5.58px);clip-path:url(#bgblur_0_0_20_clip_path);height:100%;width:100%"></div></foreignObject><circle id="Ellipse 913" opacity="0.45" data-figma-bg-blur-radius="11.1684" cx="34.9011" cy="34.9011" r="34.9011" fill="#181818"/>
+<path id="Polygon 1" d="M48.8117 34.2966C49.2771 34.5653 49.2771 35.237 48.8117 35.5056L28.4693 47.2503C28.004 47.519 27.4223 47.1831 27.4223 46.6458L27.4223 23.1565C27.4223 22.6191 28.004 22.2833 28.4693 22.5519L48.8117 34.2966Z" fill="white"/>
+</g>
+<defs>
+<clipPath id="bgblur_0_0_20_clip_path" transform="translate(11.1684 11.1684)"><circle cx="34.9011" cy="34.9011" r="34.9011"/>
+</clipPath></defs>
+</svg>
